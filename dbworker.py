@@ -3,24 +3,25 @@
 from vedis import Vedis
 import config
 
-# Пытаемся узнать из базы «состояние» пользователя
+''' DIALOG '''
 def get_current_state(user_id):
     with Vedis(config.db_file) as db:
         try:
-            return db[user_id].decode() # Если используете Vedis версии ниже, чем 0.7.1, то .decode() НЕ НУЖЕН
-        except KeyError:  # Если такого ключа почему-то не оказалось
-            return config.States.S_KEY.value  # значение по умолчанию - начало диалога
+            return db[user_id].decode()
+        except KeyError:
+            return config.States.S_KEY.value
 
-# Сохраняем текущее «состояние» пользователя в нашу базу
+
 def set_state(user_id, value):
     with Vedis(config.db_file) as db:
         try:
             db[user_id] = value
             return True
         except:
-            # тут желательно как-то обработать ситуацию
             return False
 
+
+''' KEYS'''
 def set_key(key, value):
     with Vedis(config.db_file) as db:
         try:
@@ -43,3 +44,25 @@ def use_key(key):
             return True
         except:
             return False
+
+
+''' TASKS '''
+# set value
+def set_task_value(user_id, val_name, value):
+    with Vedis(config.db_file) as db:
+            try:
+                place = str(user_id) + str(val_name)
+                db[place] = value
+                return True
+            except:
+                return False
+
+# get value
+def get_task_value(user_id, val_name):
+    with Vedis(config.db_file) as db:
+        try:
+            place = str(user_id) + str(val_name)
+            return db[place].decode()
+        except KeyError:
+            return 0
+

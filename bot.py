@@ -4,11 +4,13 @@ import re
 import telebot
 import config
 import dbworker
+import slove
 import random
 import string
+from private import teletoken
 from time import gmtime, strftime, sleep
 
-bot = telebot.TeleBot(config.token)
+bot = telebot.TeleBot(teletoken)
 
 # function generate user code
 def gen_code(stringLength):
@@ -111,7 +113,6 @@ def fix_message(message):
 def get_key_from_user(message):
 	log(strftime("%Y-%m-%d %H:%M:%S", gmtime()), message)
 	bot.send_message(message.chat.id, 'Пытаюсь распознать твой ключ...');
-	print(dbworker.get_key_info(message.text))
 	if int(dbworker.get_key_info(message.text)) > 0:
 		dbworker.use_key(message.text)
 		bot.send_sticker(message.chat.id, 'CAACAgIAAxkBAALxY17ml19ost0i90xYz_w9yP_vDDV7AAJCAANQV40QVWWRW7A7JYEaBA')
@@ -137,6 +138,7 @@ def get_key_from_user(message):
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_TASK1_DATASET.value)
 def task1_1(message):
 	log(strftime("%Y-%m-%d %H:%M:%S", gmtime()), message)
+	dbworker.set_task_value(message.chat.id, 'dataset_task1', message.text)
 	bot.send_message(message.chat.id, 'Какой из этих 3х вопросов у тебя?')
 	bot.send_photo(message.chat.id, open('./service_images/task1_1_1.png', 'rb'))
 	bot.send_photo(message.chat.id, open('./service_images/task1_1_2.png', 'rb'))
@@ -148,16 +150,17 @@ def task1_1(message):
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_TASK1_Q3.value)
 def task1_2(message):
 	log(strftime("%Y-%m-%d %H:%M:%S", gmtime()), message)
-	print(message.text)
 	if int(message.text) < 1 or int(message.text) > 3:
 		bot.send_message(message.chat.id, "Что-то не так, попробуй ещё раз!\n\nОтправь 1, 2 или 3")
 		return
 	else:
+		dbworker.set_task_value(message.chat.id, 'variant_task1', message.text)
 		if int(message.text) == 1:
 			bot.send_message(message.chat.id, 'Чему равен квантиль в 19 задании?\n\nЧилсо вида 0.85')
 			bot.send_photo(message.chat.id, open('./service_images/task1_2.png', 'rb'))
 			dbworker.set_state(message.chat.id, config.States.S_TASK1_KRVTL.value)
 		else:
+			dbworker.set_task_value(message.chat.id, 'kvrtl_task1', 0)
 			bot.send_message(message.chat.id, '**Вторая часть**')
 			bot.send_message(message.chat.id, 'Возьми данные как показано на картинке и отправь сюда')
 			bot.send_photo(message.chat.id, open('./service_images/task2.png', 'rb'))
@@ -165,12 +168,13 @@ def task1_2(message):
 
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_TASK1_KRVTL.value)
-def task1_2(message):
+def task2_1(message):
 	log(strftime("%Y-%m-%d %H:%M:%S", gmtime()), message)
 	if re.match(r'^-?\d+(?:\.\d+)?$', message.text) is None:
 		bot.send_message(message.chat.id, "Что-то не так, попробуй ещё раз!\n\nЧилсо вида 0.85")
 		return
 	else:
+		dbworker.set_task_value(message.chat.id, 'kvrtl_task1', message.text)
 		bot.send_message(message.chat.id, '**Вторая часть**')
 		bot.send_message(message.chat.id, 'Возьми данные как показано на картинке и отправь сюда')
 		bot.send_photo(message.chat.id, open('./service_images/task2.png', 'rb'))
@@ -178,8 +182,9 @@ def task1_2(message):
 
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_TASK2_DATASET.value)
-def task2_1(message):
+def task2_2(message):
 	log(strftime("%Y-%m-%d %H:%M:%S", gmtime()), message)
+	dbworker.set_task_value(message.chat.id, 'dataset_task2', message.text)
 	bot.send_message(message.chat.id, 'Какой из этих 2х вопросов у тебя?\n\nОтправь 1 или 2')
 	bot.send_photo(message.chat.id, open('./service_images/task2_1_1.png', 'rb'))
 	bot.send_photo(message.chat.id, open('./service_images/task2_1_2.png', 'rb'))
@@ -187,24 +192,26 @@ def task2_1(message):
 
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_TASK2_Q1.value)
-def task2_2(message):
+def task2_3(message):
 	log(strftime("%Y-%m-%d %H:%M:%S", gmtime()), message)
 	if int(message.text) < 1 or int(message.text) > 2:
 		bot.send_message(message.chat.id, "Что-то не так, попробуй ещё раз!\n\nОтправь 1 или 2")
 		return
 	else:
+		dbworker.set_task_value(message.chat.id, 'variant_task2', message.text)
 		bot.send_message(message.chat.id, 'Чему равна граница в 5 задании?\n\nЧилсо вида 0.9')
 		bot.send_photo(message.chat.id, open('./service_images/task2_5_1.png', 'rb'))
 		dbworker.set_state(message.chat.id, config.States.S_TASK2_BRDR.value)
 
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_TASK2_BRDR.value)
-def task2_3(message):
+def task2_4(message):
 	log(strftime("%Y-%m-%d %H:%M:%S", gmtime()), message)
 	if re.match(r'^-?\d+(?:\.\d+)?$', message.text) is None:
 		bot.send_message(message.chat.id, "Что-то не так, попробуй ещё раз!\n\nЧилсо вида 0.9")
 		return
 	else:
+		dbworker.set_task_value(message.chat.id, 'alpha_task2', message.text)
 		bot.send_message(message.chat.id, 'Для какого ответа просят границу в 5 задании?')
 		bot.send_photo(message.chat.id, open('./service_images/task2_5_2.png', 'rb'))
 		bot.send_message(message.chat.id, 'Введи ТОЧНО также как в задании!')
@@ -212,44 +219,97 @@ def task2_3(message):
 
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_TASK2_BRDR_WD.value)
-def task2_4(message):
+def task2_5(message):
 	log(strftime("%Y-%m-%d %H:%M:%S", gmtime()), message)
-	bot.send_message(message.chat.id, 'Для какого ответа просят границу в 4 задании?')
-	bot.send_photo(message.chat.id, open('./service_images/task2_4.png', 'rb'))
-	bot.send_message(message.chat.id, 'Введи ТОЧНО также как в зажании!')
-	dbworker.set_state(message.chat.id, config.States.S_TASK2_WD.value)
+	dbworker.set_task_value(message.chat.id, 'tp_1_task2', message.text)
+	if dbworker.get_task_value(message.chat.id, 'variant_task2') == '2':
+		bot.send_message(message.chat.id, 'Для какого ответа просят границу в 4 задании?')
+		bot.send_photo(message.chat.id, open('./service_images/task2_4.png', 'rb'))
+		bot.send_message(message.chat.id, 'Введи ТОЧНО также как в зажании!')
+		dbworker.set_state(message.chat.id, config.States.S_TASK2_WD.value)
+	else: 
+		bot.send_message(message.chat.id, 'Чему равен уровнь значимости?\n\nЧилсо вида 0.01')
+		bot.send_photo(message.chat.id, open('./service_images/task2_6.png', 'rb'))
+		dbworker.set_state(message.chat.id, config.States.S_TASK2_LVL.value)
 
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_TASK2_WD.value)
-def task2_5(message):
+def task2_6(message):
 	log(strftime("%Y-%m-%d %H:%M:%S", gmtime()), message)
+	dbworker.set_task_value(message.chat.id, 'tp_2_task2', message.text)
 	bot.send_message(message.chat.id, 'Чему равен уровнь значимости?\n\nЧилсо вида 0.01')
 	bot.send_photo(message.chat.id, open('./service_images/task2_6.png', 'rb'))
 	dbworker.set_state(message.chat.id, config.States.S_TASK2_LVL.value)
 
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_TASK2_LVL.value)
-def task2_6(message):
+def task2_7(message):
 	log(strftime("%Y-%m-%d %H:%M:%S", gmtime()), message)
 	if re.match(r'^-?\d+(?:\.\d+)?$', message.text) is None:
 		bot.send_message(message.chat.id, "Что-то не так, попробуй ещё раз!\n\nЧилсо вида 0.01")
 		return
 	else:
+		dbworker.set_task_value(message.chat.id, 'lvl_task2', message.text)
 		bot.send_message(message.chat.id, '**Третья часть**')
 		bot.send_message(message.chat.id, 'Возьми данные как показано на картинке и отправь сюда')
 		bot.send_photo(message.chat.id, open('./service_images/task3.png', 'rb'))
 		dbworker.set_state(message.chat.id, config.States.S_TASK3_DATASET.value)
 
 
+# task 3
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_TASK3_DATASET.value)
+def task3_1(message):
+	log(strftime("%Y-%m-%d %H:%M:%S", gmtime()), message)
+	dbworker.set_task_value(message.chat.id, 'dataset_task3', message.text)
+	bot.send_message(message.chat.id, 'Какой из этих 3х вопросов у тебя?')
+	bot.send_photo(message.chat.id, open('./service_images/task1_1_1.png', 'rb'))
+	bot.send_photo(message.chat.id, open('./service_images/task1_1_2.png', 'rb'))
+	bot.send_message(message.chat.id, 'Отправь 1 или 2')
+	dbworker.set_state(message.chat.id, config.States.S_TASK3_VAR.value)
+
+
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_TASK3_VAR.value)
+def task3_2(message):
+	log(strftime("%Y-%m-%d %H:%M:%S", gmtime()), message)
+	if int(message.text) < 1 or int(message.text) > 2:
+		bot.send_message(message.chat.id, "Что-то не так, попробуй ещё раз!\n\nОтправь 1 или 2")
+		return
+	else:
+		dbworker.set_task_value(message.chat.id, 'variant_task3', message.text)
+		bot.send_message(message.chat.id, 'Чему равен уровень в 2.2?\n\nЧилсо вида 0.01')
+		bot.send_photo(message.chat.id, open('./service_images/task2_5_1.png', 'rb'))
+		dbworker.set_state(message.chat.id, config.States.S_TASK3_LVL1.value)
+
+
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_TASK3_LVL1.value)
 def task3_3(message):
 	log(strftime("%Y-%m-%d %H:%M:%S", gmtime()), message)
-	bot.send_message(message.chat.id, 'Ты красавчик!\n\nОсталось только правильно перенести ответы!')
-	bot.send_sticker(message.chat.id, 'CAACAgIAAxkBAALxZ17mnv8T8gJ53bX6EZ4v9Mo5oXOgAALNGwAClju6F_j9cZ8iZQaKGgQ')
-	bot.send_message(message.chat.id, 'Собираю файл\n\nПримерно 10 секунд\n\nПошу терпения!')
-	sleep(10)
-	bot.send_document(message.chat.id, open('./works/test.xlsx', 'rb'))
-	dbworker.set_state(message.chat.id, config.States.S_KEY.value)
+	if re.match(r'^-?\d+(?:\.\d+)?$', message.text) is None:
+		bot.send_message(message.chat.id, "Что-то не так, попробуй ещё раз!\n\nЧилсо вида 0.01")
+		return
+	else:
+		dbworker.set_task_value(message.chat.id, 'lvl_1_task3', message.text)
+		bot.send_message(message.chat.id, 'Чему равен уровень в 3.2?\n\nЧилсо вида 0.1')
+		bot.send_photo(message.chat.id, open('./service_images/task2_5_1.png', 'rb'))
+		dbworker.set_state(message.chat.id, config.States.S_TASK3_LVL2.value)
+
+
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_TASK3_LVL2.value)
+def task3_4(message):
+	log(strftime("%Y-%m-%d %H:%M:%S", gmtime()), message)
+	if re.match(r'^-?\d+(?:\.\d+)?$', message.text) is None:
+		bot.send_message(message.chat.id, "Что-то не так, попробуй ещё раз!\n\nЧилсо вида 0.01")
+		return
+	else:
+		dbworker.set_task_value(message.chat.id, 'lvl_2_task3', message.text)
+		bot.send_message(message.chat.id, 'Ты красавчик!\n\nОсталось только правильно перенести ответы!')
+		bot.send_sticker(message.chat.id, 'CAACAgIAAxkBAALxZ17mnv8T8gJ53bX6EZ4v9Mo5oXOgAALNGwAClju6F_j9cZ8iZQaKGgQ')
+		bot.send_message(message.chat.id, 'Собираю файл\n\nПримерно 10 секунд\n\nПошу терпения!')
+		# sleep(10)
+		slove.create_file(message.chat.id, message.from_user.username)
+		bot.send_document(message.chat.id, open('./works/%s.xlsx' % message.from_user.username, 'rb'))
+		# bot.send_message(message.chat.id, 'Ууупс\nНе хватает места для файла\n\nРепорт отправлен)')
+		dbworker.set_state(message.chat.id, config.States.S_KEY.value)
 
 
 
