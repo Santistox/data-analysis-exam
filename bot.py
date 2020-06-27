@@ -51,7 +51,7 @@ def cmd_reset(message):
 	dbworker.set_state(message.chat.id, config.States.S_KEY.value)
 
 # function handles /codegen command
-@bot.message_handler(commands=['codegen'])
+@bot.message_handler(commands=['keygen'])
 def code_generation(message):
 	log(strftime("%Y-%m-%d %H:%M:%S", gmtime()), message)
 	if message.chat.id == 568371117 or message.chat.id == 509291958:
@@ -67,12 +67,22 @@ def code_generation(message):
 		bot.send_message(message.chat.id, 'Атата‼️\n\nТолько для админов!\n')
 		return
 
+# function sends logs
+@bot.message_handler(commands=['logs'])
+def code_generation(message):
+	log(strftime("%Y-%m-%d %H:%M:%S", gmtime()), message)
+	if message.chat.id == 568371117 or message.chat.id == 509291958:
+		bot.send_document(message.chat.id, open('./message_log.txt', 'rb'))
+		bot.send_message(message.chat.id, '🤖: Logs were sent\n')
+	else:
+		bot.send_message(message.chat.id, 'Атата‼️\n\nТолько для админов!\n')
+
 # function handles /help command
 @bot.message_handler(commands=['help'])
 def help_message(message):
 	log(strftime("%Y-%m-%d %H:%M:%S", gmtime()), message)
 	help_output = 'Этот бот самый лучший и быстрый способ сдать экзамен по АНАЛизу Данных!\n\n'
-	help_output += 'Купи ключ за 100₽, отправь его мне, скинь свои задания и ты получишь готовый файл с ответами и подробным решением!\n\n'
+	help_output += 'Купи ключ в группе вк, отправь его мне, скинь свои задания и ты получишь готовый файл с ответами и подробным решением!\n\n'
 	help_output += 'Как только я пойму что ключ активный, я тебе задам пару вопросов и ты получишь свое решение!\n\n'
 	help_output += 'Группа поддержки и там где купить ключ https://vk.com/public196319329\n\n'
 	help_output += 'Удачи на экзамене!'
@@ -83,7 +93,7 @@ def help_message(message):
 def help_message(message):
 	log(strftime("%Y-%m-%d %H:%M:%S", gmtime()), message)
 	help_output = 'Этот бот самый лучший и быстрый способ сдать экзамен по АНАЛизу Данных!\n\n'
-	help_output += 'Что бы использовать бота, купи ключ, он стоит 100₽ и покупается в группе, а потом приходи ко мне за инструкциями\n\n'
+	help_output += 'Что бы использовать бота, купи ключ, он покупается в группе, а потом приходи ко мне за инструкциями\n\n'
 	help_output += 'Как только я пойму что ключ активный, я тебе задам пару вопросов и ты получишь свое решение!\n\n'
 	help_output += 'Группа поддержки и там где купить ключ https://vk.com/public196319329'
 	bot.send_message(message.chat.id, help_output)
@@ -117,7 +127,7 @@ def get_key_from_user(message):
 		dbworker.use_key(message.text)
 		bot.send_sticker(message.chat.id, 'CAACAgIAAxkBAALxY17ml19ost0i90xYz_w9yP_vDDV7AAJCAANQV40QVWWRW7A7JYEaBA')
 		bot.send_message(message.chat.id, 'Твой ключ настоящий!!!\n\nИ у тебе еще {} попыток!!!'.format(dbworker.get_key_info(message.text)))
-		bot.send_message(message.chat.id, 'Теперь слушай сюда!\nЧтобы все было гладко выполняй все строго по интсрукции!!')
+		bot.send_message(message.chat.id, 'Теперь слушай сюда!\nЧтобы все было гладко выполняй все строго по инструкции!!')
 		bot.send_sticker(message.chat.id, 'CAACAgIAAxkBAALxZV7mnE5tOPjvLOtWe2lzKPzQ7jW1AAJdAAMK_MIFZjRMJxxv1nIaBA')
 		bot.send_message(message.chat.id, '**Первая часть**')
 		# ask dataset from task1
@@ -261,9 +271,9 @@ def task2_7(message):
 def task3_1(message):
 	log(strftime("%Y-%m-%d %H:%M:%S", gmtime()), message)
 	dbworker.set_task_value(message.chat.id, 'dataset_task3', message.text)
-	bot.send_message(message.chat.id, 'Какой из этих 3х вопросов у тебя?')
-	bot.send_photo(message.chat.id, open('./service_images/task1_1_1.png', 'rb'))
-	bot.send_photo(message.chat.id, open('./service_images/task1_1_2.png', 'rb'))
+	bot.send_message(message.chat.id, 'Какой из этих 2х вопросов у тебя?')
+	bot.send_photo(message.chat.id, open('./service_images/task3_1_1.png', 'rb'))
+	bot.send_photo(message.chat.id, open('./service_images/task3_1_2.png', 'rb'))
 	bot.send_message(message.chat.id, 'Отправь 1 или 2')
 	dbworker.set_state(message.chat.id, config.States.S_TASK3_VAR.value)
 
@@ -277,7 +287,7 @@ def task3_2(message):
 	else:
 		dbworker.set_task_value(message.chat.id, 'variant_task3', message.text)
 		bot.send_message(message.chat.id, 'Чему равен уровень в 2.2?\n\nЧилсо вида 0.01')
-		bot.send_photo(message.chat.id, open('./service_images/task2_5_1.png', 'rb'))
+		bot.send_photo(message.chat.id, open('./service_images/task3_2.png', 'rb'))
 		dbworker.set_state(message.chat.id, config.States.S_TASK3_LVL1.value)
 
 
@@ -290,7 +300,7 @@ def task3_3(message):
 	else:
 		dbworker.set_task_value(message.chat.id, 'lvl_1_task3', message.text)
 		bot.send_message(message.chat.id, 'Чему равен уровень в 3.2?\n\nЧилсо вида 0.1')
-		bot.send_photo(message.chat.id, open('./service_images/task2_5_1.png', 'rb'))
+		bot.send_photo(message.chat.id, open('./service_images/task3_3.png', 'rb'))
 		dbworker.set_state(message.chat.id, config.States.S_TASK3_LVL2.value)
 
 
@@ -304,7 +314,7 @@ def task3_4(message):
 		dbworker.set_task_value(message.chat.id, 'lvl_2_task3', message.text)
 		bot.send_message(message.chat.id, 'Ты красавчик!\n\nОсталось только правильно перенести ответы!')
 		bot.send_sticker(message.chat.id, 'CAACAgIAAxkBAALxZ17mnv8T8gJ53bX6EZ4v9Mo5oXOgAALNGwAClju6F_j9cZ8iZQaKGgQ')
-		bot.send_message(message.chat.id, 'Собираю файл\n\nПримерно 10 секунд\n\nПошу терпения!')
+		bot.send_message(message.chat.id, 'Собираю файл\n\nНе больше 10 секунд\n\nПошу терпения!')
 		# sleep(10)
 		slove.create_file(message.chat.id, message.from_user.username)
 		bot.send_document(message.chat.id, open('./works/%s.xlsx' % message.from_user.username, 'rb'))
