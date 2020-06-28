@@ -233,7 +233,7 @@ def task2_5(message):
 	log(strftime("%Y-%m-%d %H:%M:%S", gmtime()), message)
 	dbworker.set_task_value(message.chat.id, 'tp_1_task2', message.text)
 	if dbworker.get_task_value(message.chat.id, 'variant_task2') == '2':
-		bot.send_message(message.chat.id, 'Для какого ответа просят границу в 4 задании?')
+		bot.send_message(message.chat.id, 'Для какого ответа просят границу в 3 задании?')
 		bot.send_photo(message.chat.id, open('./service_images/task2_4.png', 'rb'))
 		bot.send_message(message.chat.id, 'Введи ТОЧНО также как в зажании!')
 		dbworker.set_state(message.chat.id, config.States.S_TASK2_WD.value)
@@ -272,20 +272,20 @@ def task3_1(message):
 	log(strftime("%Y-%m-%d %H:%M:%S", gmtime()), message)
 	dbworker.set_task_value(message.chat.id, 'dataset_task3', message.text)
 	bot.send_message(message.chat.id, 'Какой из этих 2х вопросов у тебя?')
-	bot.send_photo(message.chat.id, open('./service_images/task3_1_1.png', 'rb'))
-	bot.send_photo(message.chat.id, open('./service_images/task3_1_2.png', 'rb'))
+	bot.send_photo(message.chat.id, open('./service_images/task3_2_1.png', 'rb'))
+	bot.send_photo(message.chat.id, open('./service_images/task3_2_2.png', 'rb'))
 	bot.send_message(message.chat.id, 'Отправь 1 или 2')
-	dbworker.set_state(message.chat.id, config.States.S_TASK3_VAR.value)
+	dbworker.set_state(message.chat.id, config.States.S_TASK3_VAR_1.value)
 
 
-@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_TASK3_VAR.value)
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_TASK3_VAR_1.value)
 def task3_2(message):
 	log(strftime("%Y-%m-%d %H:%M:%S", gmtime()), message)
 	if int(message.text) < 1 or int(message.text) > 2:
 		bot.send_message(message.chat.id, "Что-то не так, попробуй ещё раз!\n\nОтправь 1 или 2")
 		return
 	else:
-		dbworker.set_task_value(message.chat.id, 'variant_task3', message.text)
+		dbworker.set_task_value(message.chat.id, 'variant1_task3', message.text)
 		bot.send_message(message.chat.id, 'Чему равен уровень в 2.2?\n\nЧилсо вида 0.01')
 		bot.send_photo(message.chat.id, open('./service_images/task3_2.png', 'rb'))
 		dbworker.set_state(message.chat.id, config.States.S_TASK3_LVL1.value)
@@ -299,6 +299,21 @@ def task3_3(message):
 		return
 	else:
 		dbworker.set_task_value(message.chat.id, 'lvl_1_task3', message.text)
+		bot.send_message(message.chat.id, 'Какой из этих 2х вопросов у тебя?')
+		bot.send_photo(message.chat.id, open('./service_images/task3_3_1.png', 'rb'))
+		bot.send_photo(message.chat.id, open('./service_images/task3_3_2.png', 'rb'))
+		bot.send_message(message.chat.id, 'Отправь 1 или 2')
+		dbworker.set_state(message.chat.id, config.States.S_TASK3_VAR_2.value)
+
+
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_TASK3_VAR_2.value)
+def task3_2(message):
+	log(strftime("%Y-%m-%d %H:%M:%S", gmtime()), message)
+	if int(message.text) < 1 or int(message.text) > 2:
+		bot.send_message(message.chat.id, "Что-то не так, попробуй ещё раз!\n\nОтправь 1 или 2")
+		return
+	else:
+		dbworker.set_task_value(message.chat.id, 'variant2_task3', message.text)
 		bot.send_message(message.chat.id, 'Чему равен уровень в 3.2?\n\nЧилсо вида 0.1')
 		bot.send_photo(message.chat.id, open('./service_images/task3_3.png', 'rb'))
 		dbworker.set_state(message.chat.id, config.States.S_TASK3_LVL2.value)
@@ -316,8 +331,9 @@ def task3_4(message):
 		bot.send_sticker(message.chat.id, 'CAACAgIAAxkBAALxZ17mnv8T8gJ53bX6EZ4v9Mo5oXOgAALNGwAClju6F_j9cZ8iZQaKGgQ')
 		bot.send_message(message.chat.id, 'Собираю файл\n\nНе больше 10 секунд\n\nПошу терпения!')
 		# sleep(10)
-		slove.create_file(message.chat.id, message.from_user.username)
-		bot.send_document(message.chat.id, open('./works/%s.xlsx' % message.from_user.username, 'rb'))
+		filename = gen_code(16)
+		slove.create_file(message.chat.id, filename)
+		bot.send_document(message.chat.id, open('./works/%s.xlsx' % filename, 'rb'))
 		# bot.send_message(message.chat.id, 'Ууупс\nНе хватает места для файла\n\nРепорт отправлен)')
 		dbworker.set_state(message.chat.id, config.States.S_KEY.value)
 

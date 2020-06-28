@@ -364,7 +364,7 @@ def task2(task_sheet, mass, varik, alpha, lvl , tp_1, tp_2):
 		task_sheet.write_formula('E{}'.format(i), '=IF(E%i>E%i,1,0)' % ((i - 1), (i - 2)))
 	# task_sheet.write_column('D2', fl_mass)
 
-def task3(task_sheet, mass, variant, lvl_1, lvl_2):
+def task3(task_sheet, mass, variant1, variant2, lvl_1, lvl_2):
 	# mass = input('datasets\n')
 
 	# датасет неочищенный в текстовом формате
@@ -404,35 +404,25 @@ def task3(task_sheet, mass, variant, lvl_1, lvl_2):
 	task_sheet.write_column('C2', col_1_clear)
 	task_sheet.write_column('D2', col_2_clear)
 
-	if variant == '1':
-		task_sheet.write('F1', '1')
-		task_sheet.write('F2', '2 alpha')
-		task_sheet.write('F3', '2.1')
-		task_sheet.write('F4', '2.2')
-		task_sheet.write('F6', '3 alpha')
-		task_sheet.write('F7', '3.1')
-		task_sheet.write('F8', '3.2')
+	task_sheet.write('F1', '1')
+	task_sheet.write('F2', '2 alpha')
+	task_sheet.write('F3', '2.1')
+	task_sheet.write('F4', '2.2')
+	task_sheet.write('F6', '3 alpha')
+	task_sheet.write('F7', '3.1')
+	task_sheet.write('F8', '3.2')
 
-		task_sheet.write_formula('G1', '=_xlfn.CORREL(C:C,D:D)')
-		task_sheet.write('G2', float(lvl_1))
+	task_sheet.write_formula('G1', '=_xlfn.CORREL(C:C,D:D)')
+	task_sheet.write('G2', float(lvl_1))
+	if variant1 == '2':
+		task_sheet.write_formula('G3', '=_xlfn.T.TEST(C:C,D:D,2,3)/2')
+	if variant1 == '1':
 		task_sheet.write_formula('G3', '=_xlfn.T.TEST(C:C,D:D,2,3)')
-		task_sheet.write_formula('G4', '=IF(G3>G2,0,1)')
-		task_sheet.write('G6', float(lvl_2))
+	task_sheet.write_formula('G4', '=IF(G3>G2,0,1)')
+	task_sheet.write('G6', float(lvl_2))
+	if variant2 == '1':
 		task_sheet.write_formula('G7', '=_xlfn.F.TEST(C:C,D:D)/2')
-		task_sheet.write_formula('G8', '=IF(G7>G6,0,1)')
-	if variant == '2':
-		task_sheet.write('F1', '1')
-		task_sheet.write('F2', '2 alpha')
-		task_sheet.write('F3', '2.1')
-		task_sheet.write('F4', '2.2')
-		task_sheet.write('F6', '3 alpha')
-		task_sheet.write('F7', '3.1')
-		task_sheet.write('F8', '3.2')
-
-		task_sheet.write_formula('G1', '=_xlfn.CORREL(C:C,D:D)')
-		task_sheet.write('G2', float(lvl_1))
-		task_sheet.write_formula('G3', '=_xlfn.T.TEST(C:C,D:D,2,3)')
-		task_sheet.write_formula('G4', '=IF(G5>G2,0,1)')
-		task_sheet.write('G6', float(lvl_2))
+	if variant2 == '2':
 		task_sheet.write_formula('G7', '=_xlfn.F.TEST(C:C,D:D)')
-		task_sheet.write_formula('G8', '=IF(G7>G6,0,1)')
+	task_sheet.write_formula('G8', '=IF(G7>G6,0,1)')
+
