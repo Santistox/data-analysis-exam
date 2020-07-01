@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
+"""Bot configuration file
 
+The file stores the dialogue stages with users.
+
+"""
 from enum import Enum
-from private import teletoken, db_file
 
 
 class States(Enum):

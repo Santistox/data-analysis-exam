@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""Functions for solving exam tasks and filling out a file
+
+3 tasks - 3 patrs of functions
+
+"""
 import xlsxwriter
 
 def analysis(mass, types):
@@ -192,11 +198,6 @@ def task1(task_sheet, mass, variant, kvrtl):
 	elem_all = len(data_mass)
 	elem_na = data_mass.count("NA")
 	elem_no_na = elem_all - elem_na
-
-	# print(elem_all, elem_na, elem_no_na)
-	# print(data_mass)
-	# print(fl_mass)
-	# print(fl_mass_sort)
 
 	# запись дататсета в файл
 	task_sheet.write('A1', 'Исходный')

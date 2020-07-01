@@ -1,3 +1,8 @@
+"""
+
+Processes user responses and generates an excel answer file
+
+"""
 import xlsxwriter
 import dbworker
 import tasks
