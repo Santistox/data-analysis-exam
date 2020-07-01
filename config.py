@@ -26,3 +26,7 @@ class States(Enum):
 
 	# Task 3
 	S_TASK3_DATASET = "30"
+	S_TASK3_VAR_1 = "31"
+	S_TASK3_LVL1 = "32"
+	S_TASK3_VAR_2 = "33"
+	S_TASK3_LVL2 = "34"
